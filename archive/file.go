@@ -1,7 +1,7 @@
 package archive
 
 import (
-	"github.com/juruen/rmapi/encoding/rm"
+	"github.com/joagonca/rmapi/encoding/rm"
 )
 
 // Set the default pagedata template to Blank

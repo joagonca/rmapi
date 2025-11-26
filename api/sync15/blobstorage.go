@@ -5,10 +5,10 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/juruen/rmapi/config"
-	"github.com/juruen/rmapi/log"
-	"github.com/juruen/rmapi/model"
-	"github.com/juruen/rmapi/transport"
+	"github.com/joagonca/rmapi/config"
+	"github.com/joagonca/rmapi/log"
+	"github.com/joagonca/rmapi/model"
+	"github.com/joagonca/rmapi/transport"
 )
 
 type BlobStorage struct {

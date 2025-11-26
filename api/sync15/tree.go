@@ -11,7 +11,7 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/juruen/rmapi/log"
+	"github.com/joagonca/rmapi/log"
 	"golang.org/x/sync/errgroup"
 )
 

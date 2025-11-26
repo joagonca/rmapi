@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/abiosoft/ishell"
-	"github.com/juruen/rmapi/util"
+	"github.com/joagonca/rmapi/util"
 )
 
 func mputCmd(ctx *ShellCtxt) *ishell.Cmd {

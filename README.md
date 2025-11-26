@@ -1,8 +1,10 @@
 # rMAPI
 
-*Note: rMAPI is effectiviely unmaintaied at this point, and this repo will be archived in the next few weeks. Please see [this discussion for more info](https://github.com/juruen/rmapi/discussions/313).*
+**This is a fork of [juruen/rmapi](https://github.com/juruen/rmapi) which has been archived.**
 
-[![Actions Status](https://github.com/juruen/rmapi/workflows/Go/badge.svg)](https://github.com/juruen/rmapi/actions)
+This fork includes migration from `unipdf` to `go-cairo` and `pdfcpu` to eliminate license restrictions and unsafe code.
+
+[![Actions Status](https://github.com/joagonca/rmapi/workflows/Go/badge.svg)](https://github.com/joagonca/rmapi/actions)
 
 
 
@@ -39,19 +41,53 @@ support for the new protocol is experimental, and you should make sure you have 
 
 # Install
 
+## Dependencies
+
+### Required for PDF annotation export with Cairo (recommended)
+
+To export PDFs with annotations overlaid on background PDFs, you need Cairo libraries:
+
+- **Ubuntu/Debian**: `sudo apt-get install libcairo2-dev pkg-config`
+- **macOS**: `brew install cairo pkg-config`
+- **Arch Linux**: `sudo pacman -S cairo pkg-config`
+- **Fedora/RHEL**: `sudo dnf install cairo-devel pkgconfig`
+
+### Optional: Thumbnail Generation
+
+If you want to enable PDF thumbnail generation (opt-in feature), you need to install `pdftoppm` from poppler-utils:
+
+- **Ubuntu/Debian**: `sudo apt-get install poppler-utils`
+- **macOS**: `brew install poppler`
+- **Arch Linux**: `sudo pacman -S poppler`
+- **Fedora/RHEL**: `sudo dnf install poppler-utils`
+
+Thumbnail generation is disabled by default. Enable it by setting the `RMAPI_THUMBNAILS` environment variable (see Environment Variables section below).
+
 ## From sources
 
 Install and build the project:
 
-```
-git clone https://github.com/juruen/rmapi
+### With Cairo support (recommended)
+
+```bash
+git clone https://github.com/joagonca/rmapi
 cd rmapi
-go install
+go build -tags cairo
+```
+
+### Without Cairo (limited PDF annotation support)
+
+If Cairo is not available, you can build without it, but PDF annotation export will be disabled:
+
+```bash
+git clone https://github.com/joagonca/rmapi
+cd rmapi
+go build
 ```
 
 ## Binary
 
-You can download an already built version for either Linux or OSX from [releases](https://github.com/juruen/rmapi/releases).
+You can download an already built version for either Linux or OSX from [releases](https://github.com/joagonca/rmapi/releases).
 
 ## Docker
 
@@ -207,8 +243,8 @@ rMAPI will set the exit code to `0` if the command succeedes, or `1` if it fails
 - `RMAPI_CONFIG`: filepath used to store authentication tokens. When not set, rmapi uses the file `.rmapi` in the home directory of the current user.
 - `RMAPI_TRACE=1`: enable trace logging.
 - `RMAPI_USE_HIDDEN_FILES=1`: use and traverse hidden files/directories (they are ignored by default).
-- `RMAPI_THUMBNAILS`: generate a thumbnail of the first page of a pdf document
+- `RMAPI_THUMBNAILS`: generate a thumbnail of the first page of a pdf document when uploading. Requires `pdftoppm` from poppler-utils to be installed (see Dependencies section).
 - `RMAPI_AUTH`: override the default authorization url
 - `RMAPI_DOC`: override the default document storage url
-- `RMAPI_HOST`: override all urls 
+- `RMAPI_HOST`: override all urls
 - `RMAPI_CONCURRENT`: sync15: maximum number of goroutines/http requests to use (default: 20)

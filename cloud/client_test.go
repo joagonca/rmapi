@@ -8,7 +8,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/juruen/rmapi/auth"
+	"github.com/joagonca/rmapi/auth"
 )
 
 const testUUID = "883ba04f-606c-41b7-8903-8d113356850f"

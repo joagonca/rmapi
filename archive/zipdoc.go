@@ -6,40 +6,77 @@ import (
 	"encoding/json"
 	"fmt"
 	"image/jpeg"
+	"image/png"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path"
 	"strconv"
 	"time"
 
 	uuid "github.com/google/uuid"
-	"github.com/juruen/rmapi/log"
-	"github.com/juruen/rmapi/util"
+	"github.com/joagonca/rmapi/log"
+	"github.com/joagonca/rmapi/util"
 	"github.com/nfnt/resize"
-	pdfmodel "github.com/unidoc/unipdf/v3/model"
-	"github.com/unidoc/unipdf/v3/render"
 )
 
 func makeThumbnail(pdf []byte) ([]byte, error) {
-	reader, err := pdfmodel.NewPdfReader(bytes.NewReader(pdf))
+	// 1. Write PDF to temporary file (pdftoppm requires a file path)
+	tmpPdf, err := os.CreateTemp("", "rmapi-pdf-*.pdf")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create temp PDF file: %w", err)
 	}
-	page, err := reader.GetPage(1)
-	if err != nil {
-		return nil, err
+	tmpPdfPath := tmpPdf.Name()
+	defer os.Remove(tmpPdfPath)
+
+	if _, err := tmpPdf.Write(pdf); err != nil {
+		tmpPdf.Close()
+		return nil, fmt.Errorf("failed to write temp PDF: %w", err)
+	}
+	tmpPdf.Close()
+
+	// 2. Use pdftoppm to render first page to PNG
+	// Output will be: tmpPdfPath.png (with -singlefile flag)
+	tmpImgPath := tmpPdfPath + ".png"
+	defer os.Remove(tmpImgPath)
+
+	cmd := exec.Command("pdftoppm",
+		"-png",          // Output as PNG
+		"-singlefile",   // Single page only (no page number suffix)
+		"-f", "1",       // First page
+		"-l", "1",       // Last page (also first page)
+		"-scale-to", "800", // Scale to reasonable resolution
+		tmpPdfPath,
+		tmpPdfPath) // Output prefix (will create tmpPdfPath.png)
+
+	// Capture stderr for better error messages
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+
+	if err := cmd.Run(); err != nil {
+		return nil, fmt.Errorf("pdftoppm failed: %w\nStderr: %s\nEnsure 'pdftoppm' is installed (part of poppler-utils)", err, stderr.String())
 	}
 
-	device := render.NewImageDevice()
-
-	image, err := device.Render(page)
+	// 3. Load the rendered image
+	imgFile, err := os.Open(tmpImgPath)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to open rendered image: %w", err)
+	}
+	defer imgFile.Close()
+
+	img, err := png.Decode(imgFile)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode PNG: %w", err)
 	}
 
-	thumbnail := resize.Resize(280, 374, image, resize.Lanczos3)
+	// 4. Resize to reMarkable thumbnail dimensions (280x374 pixels)
+	thumbnail := resize.Resize(280, 374, img, resize.Lanczos3)
+
+	// 5. Encode as JPEG
 	out := &bytes.Buffer{}
-	jpeg.Encode(out, thumbnail, nil)
+	if err := jpeg.Encode(out, thumbnail, nil); err != nil {
+		return nil, fmt.Errorf("failed to encode JPEG: %w", err)
+	}
 
 	return out.Bytes(), nil
 }
@@ -115,7 +152,7 @@ func CreateZipDocument(id, srcPath string) (zipPath string, err error) {
 	f.Write(doc)
 
 	//try to create a thumbnail
-	//due to a bug somewhere in unipdf the generation is opt-in
+	//thumbnail generation is opt-in via RMAPI_THUMBNAILS environment variable
 	if ext == util.PDF && os.Getenv("RMAPI_THUMBNAILS") != "" {
 		thumbnail, err := makeThumbnail(doc)
 		if err != nil {

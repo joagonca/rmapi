@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/abiosoft/ishell"
-	"github.com/juruen/rmapi/annotations"
+	"github.com/joagonca/rmapi/annotations"
 )
 
 func getACmd(ctx *ShellCtxt) *ishell.Cmd {

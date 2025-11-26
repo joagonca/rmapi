@@ -8,11 +8,11 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/juruen/rmapi/api/sync10"
-	"github.com/juruen/rmapi/api/sync15"
-	"github.com/juruen/rmapi/filetree"
-	"github.com/juruen/rmapi/model"
-	"github.com/juruen/rmapi/transport"
+	"github.com/joagonca/rmapi/api/sync10"
+	"github.com/joagonca/rmapi/api/sync15"
+	"github.com/joagonca/rmapi/filetree"
+	"github.com/joagonca/rmapi/model"
+	"github.com/joagonca/rmapi/transport"
 )
 
 type ApiCtx interface {

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/abiosoft/ishell"
-	"github.com/juruen/rmapi/util"
+	"github.com/joagonca/rmapi/util"
 )
 
 func putCmd(ctx *ShellCtxt) *ishell.Cmd {

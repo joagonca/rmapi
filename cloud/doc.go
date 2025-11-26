@@ -5,7 +5,7 @@
 // backward compatility purposes.
 //
 // The aim of this package is to provide simple bindings to the Remarkable Cloud API.
-// The design has been mostly discussed here: https://github.com/juruen/rmapi/issues/54.
+// The design has been mostly discussed here: https://github.com/joagonca/rmapi/issues/54.
 // It has to be high level in order to let a user easily upload, download or interact
 // with the storage of a Remarkable device.
 //

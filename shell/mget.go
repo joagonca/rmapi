@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/abiosoft/ishell"
-	"github.com/juruen/rmapi/filetree"
-	"github.com/juruen/rmapi/model"
+	"github.com/joagonca/rmapi/filetree"
+	"github.com/joagonca/rmapi/model"
 )
 
 func mgetCmd(ctx *ShellCtxt) *ishell.Cmd {
